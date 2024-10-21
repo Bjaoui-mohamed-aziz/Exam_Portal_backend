@@ -96,7 +96,6 @@ public class QuestionController {
     }
 
 
-    // eval quiz
     @PostMapping("/eval-quiz")
     public ResponseEntity<?> evalQuiz(@RequestBody List<Questions> questions, @RequestParam("userId") Long userId) {
         try {
@@ -120,8 +119,13 @@ public class QuestionController {
                 return ResponseEntity.badRequest().body("Category is missing for the quiz.");
             }
 
+            // Fetch user details
             User user = userService.getUserId(userId);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("Invalid user ID.");
+            }
 
+            // Evaluate quiz
             for (Questions q : questions) {
                 Questions question = this.service.get(q.getQuesId());
                 if (question.getAnswer().equals(q.getGivenAnswer())) {
@@ -134,13 +138,16 @@ public class QuestionController {
                 }
             }
 
+            // Save test result
             TestResult testResult = testResultService.saveTestResult(user, quiz, marksGot, correctAnswers, attempted);
 
+            // Prepare the response
             Map<Object, Object> resultMap = Map.of(
                     "marksGot", marksGot,
                     "correctAnswers", correctAnswers,
                     "attempted", attempted,
-                    "testResultId", testResult.getId()
+                    "testResultId", testResult.getId(),
+                    "username", user.getUsername() // Include username in the response
             );
 
             return ResponseEntity.ok(resultMap);
@@ -150,5 +157,36 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while evaluating the quiz.");
         }
     }
+
+
+    @GetMapping("/result/{testResultId}")
+    public ResponseEntity<?> getTestResultWithUsername(@PathVariable Long testResultId) {
+        try {
+            // Fetch the test result by ID
+            TestResult testResult = testResultService.getById(testResultId);
+            if (testResult == null) {
+                return ResponseEntity.badRequest().body("Invalid test result ID.");
+            }
+
+            // Fetch user details
+            User user = testResult.getUser();
+
+            // Prepare the response
+            Map<Object, Object> resultMap = Map.of(
+                    "marksGot", testResult.getMarksGot(),
+                    "correctAnswers", testResult.getCorrectAnswers(),
+                    "attempted", testResult.getAttempted(),
+                    "testResultId", testResult.getId(),
+                    "username", user.getUsername()
+            );
+
+            return ResponseEntity.ok(resultMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching the result.");
+        }
+    }
+
 
 }

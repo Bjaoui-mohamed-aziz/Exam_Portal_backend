@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Service
@@ -26,5 +27,14 @@ public class TestResultService {
         testResult.setResultDate(LocalDateTime.now());
 
         return testResultRepository.save(testResult);
+    }
+
+    public TestResult getById(Long id) {
+        Optional<TestResult> testResult = testResultRepository.findById(id);
+        if (testResult.isPresent()) {
+            return testResult.get();
+        } else {
+            throw new RuntimeException("Test result not found for ID: " + id);
+        }
     }
 }
