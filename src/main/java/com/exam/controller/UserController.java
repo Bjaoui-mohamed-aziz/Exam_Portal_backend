@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,9 +24,9 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @PostMapping("/")
-    public User createUser(@RequestBody User user) throws Exception {
+    public User createUser(@RequestBody User user, @RequestPart("file")MultipartFile file) throws Exception {
 
-        user.setProfile("default.png");
+        user.setProfile(file.getBytes());
         user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
 
 

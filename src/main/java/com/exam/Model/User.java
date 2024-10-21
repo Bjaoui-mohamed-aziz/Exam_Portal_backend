@@ -22,18 +22,18 @@ public class User implements UserDetails {
     private  String lastName;
     private  String email;
     private  String phone;
-    private String profile;
+    private byte[] profile;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER,mappedBy = "user")
     @JsonIgnore
     private Set<UserRole> userRoles=new HashSet<>();
 
 
-    public String getProfile() {
+    public byte[] getProfile() {
         return profile;
     }
 
-    public void setProfile(String profile) {
+    public void setProfile(byte[] profile) {
         this.profile = profile;
     }
 
@@ -53,7 +53,7 @@ public class User implements UserDetails {
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
-        this.profile = profile;
+        this.profile = profile.getBytes();
         this.enabled = enabled;
     }
 

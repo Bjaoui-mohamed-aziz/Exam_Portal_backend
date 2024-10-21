@@ -1,14 +1,17 @@
 package com.exam.controller;
 
+import com.exam.Model.User;
 import com.exam.Model.exam.Questions;
 import com.exam.Model.exam.Quiz;
+import com.exam.Model.exam.TestResult;
 import com.exam.service.QuestionService;
 import com.exam.service.QuizService;
+import com.exam.service.UserService;
+import com.exam.service.impl.TestResultService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.SQLOutput;
 import java.util.*;
 
 @RestController
@@ -16,8 +19,15 @@ import java.util.*;
 @RequestMapping("/question")
 public class QuestionController {
 
+
+    @Autowired
+    private UserService userService;
+
     @Autowired
     private QuestionService service;
+
+    @Autowired
+    private TestResultService testResultService;
 
     @Autowired
     private QuizService quizService;
@@ -34,7 +44,7 @@ public class QuestionController {
         return ResponseEntity.ok(this.service.updateQuestion(question));
     }
     //get all questions
-   @GetMapping("/quiz/{qid}")
+    @GetMapping("/quiz/{qid}")
     public ResponseEntity<?> geQuestionsOfQuiz(@PathVariable("qid") Long qid)
     {
      /*   Quiz quiz = new Quiz();
@@ -44,18 +54,18 @@ public class QuestionController {
 
         Quiz quiz = this.quizService.getQuiz(qid);
         Set<Questions> questions = quiz.getQuestions();
-         List<Questions>list = new ArrayList(questions);
-         if(list.size()>Integer.parseInt(quiz.getNumberOfQuestions()))
+        List<Questions>list = new ArrayList(questions);
+        if(list.size()>Integer.parseInt(quiz.getNumberOfQuestions()))
 
-         {
-             list=list.subList(0,Integer.parseInt(quiz.getNumberOfQuestions() + 1));
-         }
+        {
+            list=list.subList(0,Integer.parseInt(quiz.getNumberOfQuestions() + 1));
+        }
 
-         list.forEach((q) -> {
-             q.setAnswer("");
-         });
+        list.forEach((q) -> {
+            q.setAnswer("");
+        });
         Collections.shuffle(list);
-         return ResponseEntity.ok(list);
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/quiz/all/{qid}")
@@ -68,7 +78,7 @@ public class QuestionController {
 
 
 
-      //  return ResponseEntity.ok(list);
+        //  return ResponseEntity.ok(list);
     }
 
     //get single question
@@ -88,33 +98,57 @@ public class QuestionController {
 
     // eval quiz
     @PostMapping("/eval-quiz")
-    public ResponseEntity<?> evalQuiz(@RequestBody List<Questions> questions)
-    {
+    public ResponseEntity<?> evalQuiz(@RequestBody List<Questions> questions, @RequestParam("userId") Long userId) {
+        try {
+            double marksGot = 0;
+            int correctAnswers = 0;
+            int attempted = 0;
 
-        System.out.println(questions);
-        double marksGot=0;
-        int correctAnswers=0;
-        int attempted=0;
-
-        for(Questions q : questions){
-
-            //single questions
-            Questions question = this.service.get(q.getQuesId());
-            if(question.getAnswer().equals(q.getGivenAnswer()))
-            {
-                correctAnswers++;
-
-                double marksSingle = Double.parseDouble(questions.get(0).getQuiz().getMaxMarks())/questions.size();
-                marksGot += marksSingle;
-
+            // Check if questions are provided
+            if (questions.isEmpty()) {
+                return ResponseEntity.badRequest().body("No questions provided.");
             }
-            if(q.getGivenAnswer() != null){
-                attempted++;
 
+            Quiz quiz = questions.get(0).getQuiz(); // Get the quiz from the first question
 
+            // Validate quiz and its category
+            if (quiz == null || quiz.getqID() == null) {
+                return ResponseEntity.badRequest().body("Quiz or Quiz ID is missing.");
             }
-        };
-        Map<Object,Object> map = Map.of("marksGot",marksGot,"correctAnswers",correctAnswers,"attempted",attempted);
-        return ResponseEntity.ok(map);
+
+            if (quiz.getCategory() == null) {
+                return ResponseEntity.badRequest().body("Category is missing for the quiz.");
+            }
+
+            User user = userService.getUserId(userId);
+
+            for (Questions q : questions) {
+                Questions question = this.service.get(q.getQuesId());
+                if (question.getAnswer().equals(q.getGivenAnswer())) {
+                    correctAnswers++;
+                    double marksSingle = Double.parseDouble(quiz.getMaxMarks()) / questions.size();
+                    marksGot += marksSingle;
+                }
+                if (q.getGivenAnswer() != null) {
+                    attempted++;
+                }
+            }
+
+            TestResult testResult = testResultService.saveTestResult(user, quiz, marksGot, correctAnswers, attempted);
+
+            Map<Object, Object> resultMap = Map.of(
+                    "marksGot", marksGot,
+                    "correctAnswers", correctAnswers,
+                    "attempted", attempted,
+                    "testResultId", testResult.getId()
+            );
+
+            return ResponseEntity.ok(resultMap);
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the error details
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while evaluating the quiz.");
+        }
     }
+
 }

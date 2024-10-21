@@ -36,7 +36,6 @@ public class Questions {
 
     private String answer;
 
-    @Transient
     private String givenAnswer;
 
     @ManyToOne(fetch = FetchType.EAGER)

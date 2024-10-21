@@ -49,8 +49,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
             auth.userDetailsService(this.userDetailsServiceImpl).passwordEncoder(passwordEncoder());
         }
-
-        @Override
         protected void configure(HttpSecurity http) throws Exception {
 
             http
@@ -66,6 +64,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
                     .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                     .and()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
 
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

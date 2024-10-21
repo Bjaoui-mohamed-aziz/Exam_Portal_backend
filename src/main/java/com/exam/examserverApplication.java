@@ -24,9 +24,11 @@ public class examserverApplication implements CommandLineRunner {
 	}
 
 	@Override
+
 	public void run(String... args) throws Exception {
 
-			System.out.println("starting code");
+			System.out.println("loumour 6 zit");
+
 
 /*	User user = new User();
 
