@@ -159,34 +159,47 @@ public class QuestionController {
     }
 
 
-    @GetMapping("/result/{testResultId}")
-    public ResponseEntity<?> getTestResultWithUsername(@PathVariable Long testResultId) {
+    @GetMapping("/results")
+    public ResponseEntity<?> getAllTestResultsWithUsernames() {
         try {
-            // Fetch the test result by ID
-            TestResult testResult = testResultService.getById(testResultId);
-            if (testResult == null) {
-                return ResponseEntity.badRequest().body("Invalid test result ID.");
+            // Fetch all test results
+            List<TestResult> testResults = testResultService.getAllTestResults();
+
+            // Check if there are no results
+            if (testResults.isEmpty()) {
+                return ResponseEntity.badRequest().body("No test results found.");
             }
 
-            // Fetch user details
-            User user = testResult.getUser();
+            // Prepare a list to store result maps
+            List<Map<Object, Object>> resultList = new ArrayList<>();
 
-            // Prepare the response
-            Map<Object, Object> resultMap = Map.of(
-                    "marksGot", testResult.getMarksGot(),
-                    "correctAnswers", testResult.getCorrectAnswers(),
-                    "attempted", testResult.getAttempted(),
-                    "testResultId", testResult.getId(),
-                    "username", user.getUsername()
-            );
+            // Loop through each test result and add the required details to the list
+            for (TestResult testResult : testResults) {
+                User user = testResult.getUser();
 
-            return ResponseEntity.ok(resultMap);
+                Map<Object, Object> resultMap = Map.of(
+                        "marksGot", testResult.getMarksGot(),
+                        "correctAnswers", testResult.getCorrectAnswers(),
+                        "attempted", testResult.getAttempted(),
+                        "testResultId", testResult.getId(),
+                        "username", user.getUsername(),
+                            "lastName", user.getLastName()
+                );
+
+                resultList.add(resultMap);
+            }
+
+            return ResponseEntity.ok(resultList);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching the result.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching the results.");
         }
     }
 
-
+    @DeleteMapping("result/{resultId}")
+    public void deleteResult(@PathVariable("resultId") Long resultId)
+    {
+        this.testResultService.deletebyId(resultId);
+    }
 }
