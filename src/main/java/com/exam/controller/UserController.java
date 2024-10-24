@@ -2,6 +2,7 @@ package com.exam.controller;
 import com.exam.Model.User;
 import com.exam.Model.Role;
 import com.exam.Model.UserRole;
+import com.exam.Repo.UserRepository;
 import com.exam.helper.UserFoundException;
 import com.exam.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -20,6 +22,8 @@ import java.util.Set;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    private UserRepository userRepository;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -62,7 +66,12 @@ public class UserController {
     }
 
 
-@ExceptionHandler(UserFoundException.class)
+    @GetMapping("/search")
+    public List<User> searchUsers(@RequestParam String username) {
+        return userService.searchUsersByUsername(username);
+    }
+
+    @ExceptionHandler(UserFoundException.class)
     public ResponseEntity<?> exceptionhandler(UserFoundException ex){
     String errorMessage = "User already exists: " + ex.getMessage();
 

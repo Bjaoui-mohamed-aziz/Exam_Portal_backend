@@ -9,6 +9,7 @@ import com.exam.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -50,5 +51,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         this.userRepository.deleteById(userId);
+    }
+
+    @Override
+    public List<User> searchUsersByUsername(String username) {
+        return userRepository.searchByUsername(username);  // Use the custom query method
     }
 }

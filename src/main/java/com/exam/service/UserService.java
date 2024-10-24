@@ -4,6 +4,7 @@ import com.exam.Model.User;
 import com.exam.Model.UserRole;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -16,4 +17,6 @@ public interface UserService {
     public User getUserId(Long userId);
 
     public void deleteUser(Long userId);
+
+    List<User> searchUsersByUsername(String username);
 }
