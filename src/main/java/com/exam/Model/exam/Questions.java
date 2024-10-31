@@ -2,9 +2,12 @@ package com.exam.Model.exam;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.persistence.*;
 
+
+@CrossOrigin(origins = "*")
 @Entity
 public class Questions {
 

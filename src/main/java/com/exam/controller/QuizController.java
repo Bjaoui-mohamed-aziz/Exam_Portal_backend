@@ -49,6 +49,7 @@ public ResponseEntity<Quiz> update(@RequestBody Quiz quiz)
     @DeleteMapping("/{qid}")
     public void delete(@PathVariable("qid") Long qid){
         this.quizService.deleteQuiz(qid);
+
     }
 
     @GetMapping("/category/{cid}")

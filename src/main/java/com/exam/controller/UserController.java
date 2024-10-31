@@ -28,23 +28,18 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @PostMapping("/")
-    public User createUser(@RequestBody User user, @RequestPart("file")MultipartFile file) throws Exception {
-
-        user.setProfile(file.getBytes());
+    public User createUser(@RequestBody User user) throws Exception {
+        user.setProfile("default.png");
         user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
-
-
         Set<UserRole> roles = new HashSet<>();
         Role role = new Role();
         role.setRoleId(45L);
         role.setRoleName("Normal");
-
         UserRole userRole  = new UserRole();
         userRole.setUser(user);
         userRole.setRole(role);
         roles.add(userRole);
-
-     return this.userService.createUser(user, roles);
+        return this.userService.createUser(user, roles);
     }
     @GetMapping("/{username}")
     public User getUser(@PathVariable("username") String username)

@@ -31,22 +31,22 @@ public class QuestionController {
 
     @Autowired
     private QuizService quizService;
+
     //add question
     @PostMapping("/")
-    public ResponseEntity<Questions> add(@RequestBody Questions question){
+    public ResponseEntity<Questions> add(@RequestBody Questions question) {
         return ResponseEntity.ok(this.service.addQuestion(question));
     }
 
     //update the question
     @PutMapping("/")
-    public ResponseEntity<Questions> update(@RequestBody Questions question)
-    {
+    public ResponseEntity<Questions> update(@RequestBody Questions question) {
         return ResponseEntity.ok(this.service.updateQuestion(question));
     }
+
     //get all questions
     @GetMapping("/quiz/{qid}")
-    public ResponseEntity<?> geQuestionsOfQuiz(@PathVariable("qid") Long qid)
-    {
+    public ResponseEntity<?> geQuestionsOfQuiz(@PathVariable("qid") Long qid) {
      /*   Quiz quiz = new Quiz();
         quiz.setqID(qid);
         Set<Questions> questionsOfQuiz = this.service.getQuestionsOfQuiz(quiz);
@@ -54,11 +54,9 @@ public class QuestionController {
 
         Quiz quiz = this.quizService.getQuiz(qid);
         Set<Questions> questions = quiz.getQuestions();
-        List<Questions>list = new ArrayList(questions);
-        if(list.size()>Integer.parseInt(quiz.getNumberOfQuestions()))
-
-        {
-            list=list.subList(0,Integer.parseInt(quiz.getNumberOfQuestions() + 1));
+        List<Questions> list = new ArrayList(questions);
+        if (list.size() > Integer.parseInt(quiz.getNumberOfQuestions())) {
+            list = list.subList(0, Integer.parseInt(quiz.getNumberOfQuestions() + 1));
         }
 
         list.forEach((q) -> {
@@ -69,13 +67,11 @@ public class QuestionController {
     }
 
     @GetMapping("/quiz/all/{qid}")
-    public ResponseEntity<?> geQuestionsOfQuizAdmin(@PathVariable("qid") Long qid)
-    {
+    public ResponseEntity<?> geQuestionsOfQuizAdmin(@PathVariable("qid") Long qid) {
         Quiz quiz = new Quiz();
         quiz.setqID(qid);
         Set<Questions> questionsOfQuiz = this.service.getQuestionsOfQuiz(quiz);
         return ResponseEntity.ok(questionsOfQuiz);
-
 
 
         //  return ResponseEntity.ok(list);
@@ -83,15 +79,13 @@ public class QuestionController {
 
     //get single question
     @GetMapping("/{quesId}")
-    public Questions get(@PathVariable("quesId") Long quesId)
-    {
+    public Questions get(@PathVariable("quesId") Long quesId) {
         return this.service.getQuestion(quesId);
     }
 
     //delete single question
     @DeleteMapping("/{quesId}")
-    public void delete(@PathVariable("quesId") Long quesId)
-    {
+    public void delete(@PathVariable("quesId") Long quesId) {
         this.service.deleteQuestion(quesId);
     }
 
@@ -183,7 +177,7 @@ public class QuestionController {
                         "attempted", testResult.getAttempted(),
                         "testResultId", testResult.getId(),
                         "username", user.getUsername(),
-                            "lastName", user.getLastName()
+                        "lastName", user.getLastName()
                 );
 
                 resultList.add(resultMap);
@@ -198,8 +192,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("result/{resultId}")
-    public void deleteResult(@PathVariable("resultId") Long resultId)
-    {
+    public void deleteResult(@PathVariable("resultId") Long resultId) {
         this.testResultService.deletebyId(resultId);
     }
 }

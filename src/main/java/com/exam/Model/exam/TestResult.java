@@ -2,10 +2,13 @@ package com.exam.Model.exam;
 
 
 import com.exam.Model.User;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+
+@CrossOrigin(origins = "*")
 @Entity
 public class TestResult {
 
